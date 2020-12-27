@@ -225,7 +225,9 @@ function [i,j,U] = str2curalgo(algo, target, rank)
         [i,j] = CUR_ID(target.A, rank, sketch);
     elseif strcmpi(algo, 'CPQRstream')
         sketch = 'gauss';
-        [i,j] = CUR_ID_streaming(target.A, rank, sketch);
+        l = min(min(size(target.A)), rank+10);
+        s = l;
+        [i,j] = CUR_ID_streaming(target.A, rank, sketch, l, s);
     elseif strcmpi(algo, 'CPQRstreamCUR')
         sketch = 'gauss';
         [i,j,U] = CUR_ID_streaming(target.A, rank, sketch);

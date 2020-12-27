@@ -1,8 +1,8 @@
 %% test
 clear; close;
 %%
-path_target = 'C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\dataset\\';
-path = 'C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\CUR\\';
+path_target = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
+path = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
 % tag = 'ACTIVSg2000';
 % tag = 'GSE10072';
 % tag = 'large';

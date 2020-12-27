@@ -4,14 +4,12 @@
 % path_result_cache = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/result_cache/';
 % path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
 % addpath('/h2/yijun/Documents/MATLAB/lapack')
-addpath('C:\\Users\\yijundong\\Documents\\MATLAB\\lapack')
-addpath('C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\Eigenface')
 %% target generation
 clear; close;
-path = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/';
-path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
-% path_target = 'C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\dataset\\';
-% path = 'C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\CUR\\';
+% path = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/';
+% path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
+path_target = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
+path = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
 % seed = {'gauss', 500, 500, 500, @(x) log(x)}; % {'gauss', m, n, k, f}
 % seed = {'gauss', 1000, 1000, 1000, @(x) x.^2}; % {'gauss', m, n, k, f}
 % seed = {'snn', 1000, 1000, 100, 1000, 2, 1, 1e-3}; % {'snn',m,n,k,r,a,b,s}
@@ -125,8 +123,8 @@ set(gca,'FontSize',12)
 % clear; close;
 % path = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/';
 % path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
-path_target = 'C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\dataset\\';
-path = 'C:\\Users\\yijundong\\Documents\\MATLAB\\OdenUT\\RandNLA\\CUR\\';
+path_target = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
+path = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/CUR/';
 % tag = 'large';
 % tag = 'snn-1e3-1e3_a2b1_k100_r1e3_s1e-3';
 tag = 'yaleface-64x64';
@@ -139,7 +137,8 @@ k = load(sprintf('rank_%s.mat',tag)); k = k.k;
 
 tag = strcat(tag,'-srcur');
 % algos = {'SRCUR','CPQR','LUPP','LUPP2pass','RSVDDEIM','RSVDLS'};
-% test_CUR_rank(k, target, tag, algos);
+algos = {'CPQRstream', 'LUPPstream', 'RSVDDEIMstream', 'RSVDLSstream'};
+test_CUR_rank(k, target, tag, algos);
 
 %% load output data
 time = load(sprintf('time_%s.mat',tag));
@@ -183,13 +182,8 @@ sfro = sqrt(cumsum(sigma.^2,'reverse'));
 % tag = '$10^3 \times 10^3$ SNN($a=2,b=1,k=10^2$,rank$=10^3$)';
 % tag = 'Random weighted Laplacian $n=1000, m=4n$';
 % tag = 'Dense Gaussian matrix $1000 \times 1000$';
-algos = {'SVDDEIM',...
-         ...'DetLUPP',...
-         'LUCP',...
-         'DetCPQR',...
-         'SVDLS'};
 labels = arrayfun(@(i) legmap.(algos{i}), 1:length(algos), 'UniformOutput',false);
-
+%%
 % frobenius norm
 err = errfro;
 optimal = sfro;
@@ -285,16 +279,6 @@ title(sprintf('\\texttt{%s} Randomized',tag),...
 set(gca,'FontSize',12)
 
 %% Plot: randomized, stream
-algos = {'CSSVDDEIMstream',...
-         ...
-         'LUPPstream',...
-         ...
-         ...'CSLUCP',...
-         'ACA',...
-         ...
-         'CSCPQRstream',...
-         ...
-         'CSSVDLSstream'};
 labels = arrayfun(@(i) legmap.(algos{i}), 1:length(algos), 'UniformOutput',false);
 
 % frobenius norm

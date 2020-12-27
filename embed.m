@@ -39,7 +39,7 @@ end
 %%
 function S = spsign(d, k, zeta)
 % Input
-%   d: [int] ambience dim
+%   A: [d by n] -> S*A: [k by n]
 %   k: [int] embedding dim, k << d
 %   zeta: sparsity parameter, zeta >= 2
 %       number of nonzeros in each of the d columns of S / 
@@ -49,8 +49,11 @@ function S = spsign(d, k, zeta)
 %   S: [(k,d) spmatrix] sparse sign matrix
 %       nonzero = 1 or -1 w.p. 1/2 each 
     j = repelem(1:d, zeta);
-    i = randi([1,k], 1, zeta*d);
-    S = sparse(i, j, ...
-               (-1).^randi(2,size(j)), ...
-               k, d) / sqrt(zeta);
+    imat = zeros(zeta,d);
+    parfor c = 1:d
+        imat(:,c) = randperm(k,min(zeta,k))';
+    end
+    i = reshape(imat,1,[]);
+    vals = (-1).^randi(2, 1, d*zeta);
+    S = sparse(i, j, vals, k, d) / sqrt(zeta);
 end

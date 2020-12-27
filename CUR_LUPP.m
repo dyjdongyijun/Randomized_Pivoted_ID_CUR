@@ -38,6 +38,7 @@ function [I,J] = CUR_LUPP(A,k,sketch,stream,power,ortho)
             [~,~,J] = lu(Z,'vector');
             [~,~,I] = lu(A(:,J(1:k)),'vector');
         end
+        
     else
         %% row+col sampling
         Sy = embed(n,l,sketch);
