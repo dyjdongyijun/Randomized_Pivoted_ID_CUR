@@ -1,20 +1,24 @@
 addpath("/Users/ydong/Documents/GraphBLAS/GraphBLAS")
 clear; close;
 %%
-% path = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/';
-% path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
+path = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/';
+path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
 path_target = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
 path = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/CUR/';
-% tag = 'large';
+tag = 'large';
 % tag = 'snn-1e3-1e3_a2b1_k100_r1e3_s1e-3';
-tag = 'yaleface-64x64';
+% tag = 'yaleface-64x64';
 % tag = 'mnist-train'; 
-target = load(fullfile(path_target, sprintf('target_%s',tag)));
+% target = load(fullfile(path_target, sprintf('target_%s',tag)));
 %%
 n = 1000;
-ks = 10:15:164;
+% ks = 30:30:339; % snn-1e3-1e3_a2b1_k100_r1e3_s1e-3
+% ks = 10:15:164; % yaleface-64x64
+% ks = 50:50:713; % mnist-train
+ks = 400:400:4000; % large
 embeds = {'gauss','srft','sparse3'};
-test_sketch_rank(tag, ks, embeds, path, path_target)
+repeat = 10;
+test_sketch_rank(tag, ks, embeds, path, path_target, repeat);
 %%
 out = load(fullfile(pwd, sprintf('%s_%s', 'sketch-rank', tag)));
 %%
@@ -55,7 +59,7 @@ for eidx = 1:length(embeds)
     plot(xdata, ydata.(e), strcat(markers{eidx},'-'), 'LineWidth', 1.5)
 end
 hold off
-legend(labels{:}, 'interpreter', 'latex')
+legend('$\sigma_{k+1}$', labels{:}, 'interpreter', 'latex')
 ylabel('$||A - Q Q^T A||_2$', 'interpreter', 'latex')
 xlabel('rank', 'interpreter', 'latex')
 set(gca,'fontsize',16)
@@ -70,7 +74,7 @@ for eidx = 1:length(embeds)
     plot(xdata, ydata.(e), strcat(markers{eidx},'-'), 'LineWidth', 1.5)
 end
 hold off
-legend(labels{:}, 'interpreter', 'latex')
+legend('$\sqrt{\sum_{i > k} \sigma_i^2}$', labels{:}, 'interpreter', 'latex')
 ylabel('$||A - Q Q^T A||_F$', 'interpreter', 'latex')
 xlabel('rank', 'interpreter', 'latex')
 set(gca,'fontsize',16)

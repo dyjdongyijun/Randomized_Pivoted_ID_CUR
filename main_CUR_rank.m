@@ -44,7 +44,7 @@ target = TargetMatGenerator(Ain, 'svd');
 target.description = tag;
 A = target.A;
 % plot(target.sigma, 'k.-')
-
+save(fullfile(path_target,sprintf('target_%s',tag)), '-struct', 'target')
 %% Eigenface 64x64
 clear; close;
 load('Yale_64x64.mat'); % fields = {fea = (n*d(=h*w)) image database, gnd = (n*1) label}
