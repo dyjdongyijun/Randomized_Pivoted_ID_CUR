@@ -1,5 +1,3 @@
-addpath("/Users/ydong/Documents/GraphBLAS/GraphBLAS")
-clear; close;
 %%
 % path = '/h2/yijun/Documents/MATLAB/RandNLA/CUR/';
 % path_target = '/h2/yijun/Documents/MATLAB/RandNLA/dataset/';
