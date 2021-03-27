@@ -1,4 +1,4 @@
-function time = test_CUR_time(nvec, kvec, tag, gpu)
+function time = test_pivot_time(nvec, kvec, tag, gpu)
     if ~exist('nvec','var') || isempty(nvec)
         nvec = (2:2:20)*1000;
     end
