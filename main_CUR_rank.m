@@ -13,21 +13,20 @@ path_target = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/dataset/';
 path = '/Users/ydong/Documents/MATLAB/OdenUT/RandNLA/CUR/';
 
 algos = {'RSVDDEIM','LUPP','LUPP2pass','CPQR','CPQR2pass','RSVDLS','SRCUR'};
+% algos = {'CPQRstream', 'LUPPstream', 'RSVDDEIMstream', 'RSVDLSstream'};
 
 % tag = 'large';
 % tag = 'snn-1e3-1e3_a2b1_k100_r1e3_s1e-3';
 % tag = 'yaleface-64x64';
 % tag = 'mnist-train';
 
-tag = 'hemholtz4000x4000';
-% tag = 'hemholtz2000x2000';
-% tag = 'laplace4000x4000';
-% tag = 'laplace2000x2000';
+% tag = 'hemholtz4000x4000';
+tag = 'laplace4000x4000';
 
 target = load(strcat(path_target, sprintf('target_%s.mat',tag)));
 A = target.A;
 k = load(sprintf('rank_%s.mat',tag)); k = k.k;
-test_CUR_rank(k, target, tag, algos)
+% test_CUR_rank(k, target, tag, algos)
 % scp yijun@natt.oden.utexas.edu:/h2/yijun/Documents/MATLAB/RandNLA/CUR/*_ACTIVSg2000.mat
 
 % tag = strcat(tag,'-srcur');
@@ -40,7 +39,9 @@ time = load(sprintf('time_%s.mat',tag));
 errfro = load(sprintf('errfro_%s.mat',tag));
 err2 = load(sprintf('err2_%s.mat',tag));
 %% % % % % % % % % % % Plots % % % % % % % % % %
-algos = {'RSVDDEIM','LUPP','LUPP2pass','CPQR','CPQR2pass','RSVDLS','SRCUR'};
+algos = {'RSVDDEIM','LUPP','LUPP2pass','CPQR','CPQR2pass',...
+         ...'RSVDLS','SRCUR'...
+         };
 
 markers = {'o','s','d','^','v','>','<','p','h','+','*','x'};
 legmap = struct('DetCPQR','Det-CPQR',...
@@ -94,52 +95,54 @@ sfro = sqrt(cumsum(sigma.^2,'reverse'));
 % tag = 'Dense Gaussian matrix $1000 \times 1000$';
 
 % frobenius norm
-% err = errfro;
-% optimal = sfro;
-% figure()     
-% semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
-% hold on
-% for aux = 1:length(algos)
-%     semilogy(k, (err.(algos{aux}))./optimal(1), mkmap.(algos{aux}), 'LineWidth', 1.5)
-% end
-% hold off
-% xlim([k(1) k(end)])
-% xlabel('$k$','interpreter','latex')
-% ylabel('$||A-CUR||_F/||A||_F$','interpreter','latex')
-% legend('$\sqrt{\sum_{i=k+1}^r \sigma_i^2}/\sqrt{\sum_{i=1}^r \sigma_i^2}$',...
-%        labels{:},...
-%        'interpreter','latex')
-% % title(sprintf('\\texttt{%s} Randomized',tag), 'interpreter','latex')
-% set(gca,'FontSize',22)
+err = errfro;
+optimal = sfro;
+ed = length(k)-2;
 
-% spectral norm
-err = err2;
-optimal = sigma;
-% figure()   
-subplot(1,2,1)
+figure()     
 semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
 hold on
 for aux = 1:length(algos)
     semilogy(k, (err.(algos{aux}))./optimal(1), mkmap.(algos{aux}), 'LineWidth', 1.5)
 end
 hold off
-xlim([k(1) k(end)])
+xlim([k(1) k(ed)])
+xlabel('$k$','interpreter','latex')
+ylabel('$||A-CUR||_F/||A||_F$','interpreter','latex')
+legend('$\sqrt{\sum_{i=k+1}^r \sigma_i^2}/\sqrt{\sum_{i=1}^r \sigma_i^2}$',...
+       labels{:},...
+       'interpreter','latex')
+% title(sprintf('\\texttt{%s} Randomized',tag), 'interpreter','latex')
+set(gca,'FontSize',22)
+
+% spectral norm
+err = err2;
+optimal = sigma;
+figure()   
+% subplot(1,2,1)
+semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
+hold on
+for aux = 1:length(algos)
+    semilogy(k, (err.(algos{aux}))./optimal(1), mkmap.(algos{aux}), 'LineWidth', 1.5)
+end
+hold off
+xlim([k(1) k(ed)])
 xlabel('$k$','interpreter','latex')
 ylabel('$||A-CUR||_2/||A||_2$','interpreter','latex')
-legend('$\sigma_{k+1}/\sigma_{1}$', labels{:}, 'interpreter','latex')
+% legend('$\sigma_{k+1}/\sigma_{1}$', labels{:}, 'interpreter','latex')
 title('Spectral norm error', 'interpreter','latex')
 set(gca,'FontSize',22)
 
 % time
-% figure()
-subplot(1,2,2)
+figure()
+% subplot(1,2,2)
 semilogy(k, time.(algos{1}), mkmap.(algos{aux}), 'LineWidth', 1.5) 
 hold on
 for aux = 1:length(algos)
     plot(k, time.(algos{aux}), mkmap.(algos{aux}), 'LineWidth', 1.5)
 end
 hold off
-xlim([k(2) k(end)])
+xlim([k(2) k(ed)])
 xlabel('$k$','interpreter','latex')
 ylabel('Time (s)','interpreter','latex')
 % legend(labels{:}, 'interpreter','latex')
