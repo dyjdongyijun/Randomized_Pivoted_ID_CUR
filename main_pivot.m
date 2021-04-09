@@ -10,7 +10,7 @@ kvec = [10,20,30,40];
 tag = 'n1024e3_k1e3';
 
 % time = test_pivot_time(nvec, kvec, tag);
-gpu = 1;
+% gpu = 1;
 % time = test_pivot_time(nvec, kvec, tag, gpu);
 %%
 time = load(sprintf('pivot-ps_%s.mat',tag));
@@ -18,7 +18,7 @@ markers = {'ro','gs','bd','c^','mv','y>','<','p','h','+','*','x'};
 algos = {'LUPP','CPQR','DEIM'};
 
 nplots = length(time.kvec);
-for ik = 2:nplots
+for ik = 1:nplots-1
     figure()
 %     subplot(1,3,ik-1)
     loglog(time.nvec, time.(algos{1})(:,ik)', ... ./time.nvec, ...
