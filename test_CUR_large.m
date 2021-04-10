@@ -17,12 +17,13 @@ function test_CUR_large(sz, ranks, algos, tag)
     r = 400; s = 2/r;
     r0 = 100; a = 2; b = 1;
     X = sprand(m,r,s); Y = sprand(r,n,s); 
-    d = 1./(1:r);
+    d = 2.^(-(1:r).*(16/r));
     d(1:r0) = d(1:r0)*a; d(r0+1:r) = d(r0+1:r)*b;
     AL = (X.*d); AR = Y;
     A = {AL, AR};
     [~,TL] = qr(full(AL),0);
     [~,TR] = qr(full(AR'),0);
+    spec = svd(TL*TR');
     disp('Target generated')
     
     if ~exist('algos','var') || isempty(algos)
@@ -41,7 +42,8 @@ function test_CUR_large(sz, ranks, algos, tag)
     if ~exist('tag','var') || isempty(tag)
         tag = 'aux';
     end
-
+    
+    save_target(spec, tag);
     %% Initialization
     rank_file = sprintf('rank_%s.mat',tag);
     if isfile(rank_file)
@@ -114,6 +116,14 @@ function test_CUR_large(sz, ranks, algos, tag)
 
 end
 
+
+function save_target(spec, tag)
+    file = sprintf('target-spec_%s.mat',tag);
+    out = struct('tag',tag,...
+                 'spec',spec);
+    save(file,'-struct','out')
+    fprintf('write out: %s \n', file)
+end
 
 
 function save_time(time, tag)
