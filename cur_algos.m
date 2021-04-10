@@ -203,6 +203,7 @@ function [i,j] = cur_algos(algo, A, l)
 end
 
 function [U,S,V] = rsvd_oracle(AL,AR,l)
+    n = size(AR,2);
     sketch = 'gauss';
     Smpr = embed(n, l, sketch);
     Y = AL * Smpr(AR')'; % (m,l)
