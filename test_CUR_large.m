@@ -21,6 +21,8 @@ function test_CUR_large(sz, ranks, algos, tag)
     d(1:r0) = d(1:r0)*a; d(r0+1:r) = d(r0+1:r)*b;
     AL = (X.*d); AR = Y;
     A = {AL, AR};
+    [~,TL] = qr(full(AL),0);
+    [~,TR] = qr(full(AR'),0);
     disp('Target generated')
     
     if ~exist('algos','var') || isempty(algos)
@@ -58,6 +60,13 @@ function test_CUR_large(sz, ranks, algos, tag)
         errfro = struct();
     end
     
+    err2_file = sprintf('err2_%s.mat', tag);
+    if isfile(err2_file)
+        err2 = load(err2_file);
+    else
+        err2 = struct();
+    end
+    
     time_file = sprintf('time_%s.mat',tag);
     if isfile(time_file)
         time = load(sprintf('time_%s.mat',tag));
@@ -71,7 +80,7 @@ function test_CUR_large(sz, ranks, algos, tag)
         fprintf('%s \n', algo)
         time.(algo) = zeros(size(k));
         errfro.(algo) = zeros(size(k));
-        
+        err2.(algo) = zeros(size(k));
         
         for t = 1:length(k)
             tic;
@@ -90,15 +99,17 @@ function test_CUR_large(sz, ranks, algos, tag)
             [Qrl,~] = qr(full(RL'),0); % (r,l)
             
             Ecore = eye(r) - (Qcr * (Qcr' * Qrl)) * Qrl'; % (r,r)
-            E = (AL * Ecore) * AR;
-            errfro.(algo)(t) = norm(E, 'fro');
+            Euinv = (TL * Ecore) * TR; % (r,r)
+            errfro.(algo)(t) = norm(Euinv, 'fro');
+            err2.(algo)(t) = norm(Euinv);
             fprintf('%d / %d\t', t, length(k));
         end
         fprintf('\n')
         
         
         save_time(time, tag);
-        save_err(errfro, tag)
+        save_err(errfro, tag,'fro')
+        save_err(err2, tag,'2')
     end
 
 end
@@ -111,8 +122,8 @@ function save_time(time, tag)
     fprintf('write out: %s \n', time_file)
 end
 
-function save_err(err, tag)
-    err_file = sprintf('errfro_%s.mat',tag);
+function save_err(err, tag, errmeas)
+    err_file = sprintf('err%s_%s.mat',errmeas,tag);
     save(err_file,'-struct','err')
     fprintf('write out: %s \n', err_file)
 end
