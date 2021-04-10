@@ -99,7 +99,7 @@ function test_CUR_large(sz, ranks, algos, tag)
             [Qrl,~] = qr(full(RL'),0); % (r,l)
             
             Ecore = eye(r) - (Qcr * (Qcr' * Qrl)) * Qrl'; % (r,r)
-            Euinv = (TL * Ecore) * TR; % (r,r)
+            Euinv = (TL * Ecore) * TR'; % (r,r)
             errfro.(algo)(t) = norm(Euinv, 'fro');
             err2.(algo)(t) = norm(Euinv);
             fprintf('%d / %d\t', t, length(k));
