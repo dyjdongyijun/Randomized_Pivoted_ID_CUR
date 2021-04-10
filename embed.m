@@ -50,7 +50,7 @@ function S = spsign(d, k, zeta)
 %       nonzero = 1 or -1 w.p. 1/2 each 
     j = repelem(1:d, zeta);
     imat = zeros(zeta,d);
-    parfor c = 1:d
+    for c = 1:d
         imat(:,c) = randperm(k,min(zeta,k))';
     end
     i = reshape(imat,1,[]);

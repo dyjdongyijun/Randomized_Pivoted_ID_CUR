@@ -29,17 +29,17 @@ function [i,j] = cur_algos(algo, A, l)
             if oracle
                 XL = Smpr(AL); % (l,r)
                 X = XL * AR; % (l,n)
-                [~,~,j] = lu(X','vector'); 
+                [~,~,j] = lu(full(X'),'vector'); 
                 j = j(1:l);
                 C = AL * AR(:,j); %(m,l)
-                [~,~,i] = lu(C,'vector');
+                [~,~,i] = lu(full(C),'vector');
                 i = i(1:l);
             else
                 X = Smpr(A); % (l,n)
-                [~,~,j] = lu(X','vector'); 
+                [~,~,j] = lu(full(X'),'vector'); 
                 j = j(1:l);
                 C = A(:,j); %(m,l)
-                [~,~,i] = lu(C,'vector');
+                [~,~,i] = lu(full(C),'vector');
                 i = i(1:l);
             end
         case 'LUPP2pass'
@@ -48,18 +48,18 @@ function [i,j] = cur_algos(algo, A, l)
             if oracle
                 Y = AL * Smpr(AR')'; % (m,l)
                 X = AR' * (AL' * Y); %(n,l)
-                [~,~,j] = lu(X,'vector');
+                [~,~,j] = lu(full(X),'vector');
                 j = j(1:l);
                 C = AL * AR(:,j); %(m,l)
-                [~,~,i] = lu(C,'vector');
+                [~,~,i] = lu(full(C),'vector');
                 i = i(1:l);
             else
                 Yt = Smpr(A'); % (l,m)
                 X = Yt*A; %(l,n)
-                [~,~,j] = lu(X','vector');
+                [~,~,j] = lu(full(X'),'vector');
                 j = j(1:l);
                 C = A(:,j); %(m,l)
-                [~,~,i] = lu(C,'vector');
+                [~,~,i] = lu(full(C),'vector');
                 i = i(1:l);
             end
         case 'CSLUPP'
@@ -68,17 +68,17 @@ function [i,j] = cur_algos(algo, A, l)
             if oracle
                 XL = Smpr(AL); % (l,r)
                 X = XL * AR; % (l,n)
-                [~,~,j] = lu(X','vector'); 
+                [~,~,j] = lu(full(X'),'vector'); 
                 j = j(1:l);
                 C = AL * AR(:,j); %(m,l)
-                [~,~,i] = lu(C,'vector');
+                [~,~,i] = lu(full(C),'vector');
                 i = i(1:l);
             else
                 X = Smpr(A); % (l,n)
-                [~,~,j] = lu(X','vector'); 
+                [~,~,j] = lu(full(X'),'vector'); 
                 j = j(1:l);
                 C = A(:,j); %(m,l)
-                [~,~,i] = lu(C,'vector');
+                [~,~,i] = lu(full(C),'vector');
                 i = i(1:l);
             end
         case 'LUPPstream'
@@ -87,16 +87,16 @@ function [i,j] = cur_algos(algo, A, l)
             Smpr_n = embed(n, l, sketch);
             if oracle
                 X = Smpr_m(AL) * AR; % (l,n)
-                [~,~,j] = lu(X','vector'); 
+                [~,~,j] = lu(full(X'),'vector'); 
                 j = j(1:l);
                 Y = AL * Smpr_n(AR')'; %(m,l)
-                [~,~,i] = lu(Y,'vector');
+                [~,~,i] = lu(full(Y),'vector');
                 i = i(1:l);
             else
                 X = Smpr_m(A); % (l,n)
                 Yt = Smpr_n(A'); % (l,m)
-                [~,~,j] = lu(X','vector');
-                [~,~,i] = lu(Yt','vector');
+                [~,~,j] = lu(full(X'),'vector');
+                [~,~,i] = lu(full(Yt'),'vector');
                 j = j(1:l);
                 i = i(1:l);
             end
