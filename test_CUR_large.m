@@ -1,20 +1,27 @@
-function test_CUR_large(A, ranks, algos, tag)
+function test_CUR_large(sz, ranks, algos, tag)
 %%
 %   A: (m,n) matrix
 %   k: true rank of decomposition (i.e., denoted as l = target rank + O(1) in the manuscript)
 
     %%
-    if isempty(A)
+    if isempty(sz)
         % default target: (1e6, 1e6) sparse non-negative matrix of rank r = 1000
-        m = 1e6; n = m; r = 1000; s = 2/r;
-        r0 = 100; a = 2; b = 1;
-        X = sprand(m,r,s); Y = sprand(r,n,s); 
-        d = 1./(1:r);
-        d(1:r0) = d(1:r0)*a; d(r0+1:r) = d(r0+1:r)*b;
-        A = (X.*d)*Y;
-        
-        tag = 'snn-1e6-1e6-a2b1-k100-r1e3-s2e-3';
+        m = 1e6; n = m; 
+        tag = 'snn-1e6-1e6-a2b1-k100-r400-s2or';
+    elseif length(sz) < 2
+        m = sz(1); n = m;
+    else 
+        m = sz(1); n = sz(2);
     end
+    
+    r = 400; s = 2/r;
+    r0 = 100; a = 2; b = 1;
+    X = sprand(m,r,s); Y = sprand(r,n,s); 
+    d = 1./(1:r);
+    d(1:r0) = d(1:r0)*a; d(r0+1:r) = d(r0+1:r)*b;
+    AL = (X.*d); AR = Y;
+    A = {AL, AR};
+    disp('Target generated')
     
     if ~exist('algos','var') || isempty(algos)
         algos = {'SRCUR',...
@@ -68,17 +75,22 @@ function test_CUR_large(A, ranks, algos, tag)
         
         for t = 1:length(k)
             tic;
-            [i,j] = str2curalgo(algo, target, k(t));
+            [i,j] = cur_algos(algo, A, k(t));
             time.(algo)(t) = toc;
             
             fprintf('k = %d: %.4f\n', k(t), time.(algo)(t))
         end
-
+        
         
         for t = 1:length(k)
-            C = A(:,j(1:k(t)));
-            R = A(i(1:k(t)),:);
-            E = CUR_Error(A,C,R);
+            % A = AL * Proj(CR) * Proj(RL) * AR
+            CR = AR(:,j(1:k(t))); % (r,l)
+            [Qcr,~] = qr(full(CR),0); % (r,l)
+            RL = AL(i(1:k(t)),:); % (l,r)
+            [Qrl,~] = qr(full(RL'),0); % (r,l)
+            
+            Ecore = eye(r) - (Qcr * (Qcr' * Qrl)) * Qrl'; % (r,r)
+            E = (AL * Ecore) * AR;
             errfro.(algo)(t) = norm(E, 'fro');
             fprintf('%d / %d\t', t, length(k));
         end

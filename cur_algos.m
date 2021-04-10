@@ -4,90 +4,212 @@ function [i,j] = cur_algos(algo, A, l)
 %    'CPQR', 'CPQR2pass', 'CSCPQR', 'CPQRstream',...
 %    'RSVDDEIM',...
 %    'RSVDLS'}
+    if iscell(A)
+        AL = A{1}; % (m,r)
+        AR = A{2}; % (r,n)
+        m = size(AL,1); n = size(AR,2);
+        oracle = 1;
+    else
+        m = size(A,1); n = size(A,2);
+        oracle = 0;
+    end
+%%
     switch algo
         % srcur
         case 'SRCUR'
-            [i,j] = srcur(A, l);
+            if oracle
+                [i,j] = srcur(AL*AR, l);
+            else
+                [i,j] = srcur(A, l);
+            end
         % lupp
         case 'LUPP'
             sketch = 'gauss';
             Smpr = embed(m, l, sketch);
-            X = Smpr(A); % (l,n)
-            [~,~,j] = lu(X','vector');
-            C = A(:,j(1:l)); %(m,l)
-            [~,~,i] = lu(C,'vector');
+            if oracle
+                XL = Smpr(AL); % (l,r)
+                X = XL * AR; % (l,n)
+                [~,~,j] = lu(X','vector'); 
+                j = j(1:l);
+                C = AL * AR(:,j); %(m,l)
+                [~,~,i] = lu(C,'vector');
+                i = i(1:l);
+            else
+                X = Smpr(A); % (l,n)
+                [~,~,j] = lu(X','vector'); 
+                j = j(1:l);
+                C = A(:,j); %(m,l)
+                [~,~,i] = lu(C,'vector');
+                i = i(1:l);
+            end
         case 'LUPP2pass'
             sketch = 'gauss';
             Smpr = embed(n, l, sketch);
-            Yt = Smpr(A'); % (l,m)
-            X = Yt*A; %(l,n)
-            [~,~,i] = lu(X','vector');
-            R = A(i(1:l),:); %(l,n)
-            [~,~,j] = lu(R','vector');
+            if oracle
+                Y = AL * Smpr(AR')'; % (m,l)
+                X = AR' * (AL' * Y); %(n,l)
+                [~,~,j] = lu(X,'vector');
+                j = j(1:l);
+                C = AL * AR(:,j); %(m,l)
+                [~,~,i] = lu(C,'vector');
+                i = i(1:l);
+            else
+                Yt = Smpr(A'); % (l,m)
+                X = Yt*A; %(l,n)
+                [~,~,j] = lu(X','vector');
+                j = j(1:l);
+                C = A(:,j); %(m,l)
+                [~,~,i] = lu(C,'vector');
+                i = i(1:l);
+            end
         case 'CSLUPP'
             sketch = 'sparse8';
             Smpr = embed(m, l, sketch);
-            X = Smpr(A); % (l,n)
-            [~,~,j] = lu(X','vector');
-            C = A(:,j(1:l)); %(m,l)
-            [~,~,i] = lu(C,'vector');
+            if oracle
+                XL = Smpr(AL); % (l,r)
+                X = XL * AR; % (l,n)
+                [~,~,j] = lu(X','vector'); 
+                j = j(1:l);
+                C = AL * AR(:,j); %(m,l)
+                [~,~,i] = lu(C,'vector');
+                i = i(1:l);
+            else
+                X = Smpr(A); % (l,n)
+                [~,~,j] = lu(X','vector'); 
+                j = j(1:l);
+                C = A(:,j); %(m,l)
+                [~,~,i] = lu(C,'vector');
+                i = i(1:l);
+            end
         case 'LUPPstream'
             sketch = 'gauss';
             Smpr_m = embed(m, l, sketch);
             Smpr_n = embed(n, l, sketch);
-            X = Smpr_m(A); % (l,n)
-            Yt = Smpr_n(A'); % (l,m)
-            [~,~,j] = lu(X','vector');
-            [~,~,i] = lu(Yt','vector');
+            if oracle
+                X = Smpr_m(AL) * AR; % (l,n)
+                [~,~,j] = lu(X','vector'); 
+                j = j(1:l);
+                Y = AL * Smpr_n(AR')'; %(m,l)
+                [~,~,i] = lu(Y,'vector');
+                i = i(1:l);
+            else
+                X = Smpr_m(A); % (l,n)
+                Yt = Smpr_n(A'); % (l,m)
+                [~,~,j] = lu(X','vector');
+                [~,~,i] = lu(Yt','vector');
+                j = j(1:l);
+                i = i(1:l);
+            end
         % cpqr
         case 'CPQR'
             sketch = 'gauss';
             Smpr = embed(m, l, sketch);
-            X = Smpr(A); % (l,n)
-            [~,~,j] = qr(full(X),0);
-            C = A(:,j(1:l)); %(m,l)
-            [~,~,i] = qr(full(C'),0);
+            if oracle
+                XL = Smpr(AL); % (l,r)
+                X = XL * AR; % (l,n)
+                [~,~,j] = qr(full(X),0);
+                j = j(1:l);
+                C = AL * AR(:,j); %(m,l)
+                [~,~,i] = qr(full(C'),0);
+                i = i(1:l);
+            else
+                X = Smpr(A); % (l,n)
+                [~,~,j] = qr(full(X),0);
+                j = j(1:l);
+                C = A(:,j); %(m,l)
+                [~,~,i] = qr(full(C'),0);
+                i = i(1:l);
+            end          
         case 'CPQR2pass'
             sketch = 'gauss';
             Smpr = embed(n, l, sketch);
-            Yt = Smpr(A'); % (l,m)
-            X = Yt*A; %(l,n)
-            [~,~,i] = qr(full(X),0);
-            R = A(i(1:l),:); %(l,n)
-            [~,~,j] = qr(full(R),0);
+            if oracle
+                Y = AL * Smpr(AR')'; % (m,l)
+                X = AR' * (AL' * Y); %(n,l)
+                [~,~,j] = qr(full(X'),0);
+                j = j(1:l);
+                C = AL * AR(:,j); %(m,l)
+                [~,~,i] = qr(full(C'),0);
+                i = i(1:l);
+            else
+                Yt = Smpr(A'); % (l,m)
+                X = Yt*A; %(l,n)
+                [~,~,j] = qr(full(X'),0);
+                j = j(1:l);
+                C = A(:,j); %(m,l)
+                [~,~,i] = qr(full(C'),0);
+                i = i(1:l);
+            end
         case 'CSCPQR'
             sketch = 'sparse8';
             Smpr = embed(m, l, sketch);
-            X = Smpr(A); % (l,n)
-            [~,~,j] = qr(full(X),0);
-            C = A(:,j(1:l)); %(m,l)
-            [~,~,i] = qr(full(C'),0);
+            if oracle
+                XL = Smpr(AL); % (l,r)
+                X = XL * AR; % (l,n)
+                [~,~,j] = qr(full(X),0);
+                j = j(1:l);
+                C = AL * AR(:,j); %(m,l)
+                [~,~,i] = qr(full(C'),0);
+                i = i(1:l);
+            else
+                X = Smpr(A); % (l,n)
+                [~,~,j] = qr(full(X),0);
+                j = j(1:l);
+                C = A(:,j); %(m,l)
+                [~,~,i] = qr(full(C'),0);
+                i = i(1:l);
+            end        
         case 'CPQRstream'
             sketch = 'gauss';
             Smpr_m = embed(m, l, sketch);
             Smpr_n = embed(n, l, sketch);
-            X = Smpr_m(A); % (l,n)
-            Yt = Smpr_n(A'); % (l,m)
-            [~,~,j] = qr(full(X),0);
-            [~,~,i] = qr(full(Yt),0);
+            if oracle
+                X = Smpr_m(AL) * AR; % (l,n)
+                [~,~,j] = qr(full(X),0);
+                j = j(1:l);
+                Y = AL * Smpr_n(AR')'; %(m,l)
+                [~,~,i] = qr(full(Y'),0);
+                i = i(1:l);
+            else
+                X = Smpr_m(A); % (l,n)
+                Yt = Smpr_n(A'); % (l,m)
+                [~,~,j] = qr(full(X),0);
+                [~,~,i] = qr(full(Yt),0);
+                j = j(1:l);
+                i = i(1:l);
+            end
         % deim
         case 'RSVDDEIM'
-            [V,~,W] = RSVD(A,l);
+            if oracle
+                [V,~,W] = rsvd_oracle(AL,AR,l);
+            else
+                [V,~,W] = RSVD(A,l);
+            end
             [~,~,i] = lu(V,'vector');
             [~,~,j] = lu(W,'vector');
         % leverage score sampling
         case 'RSVDLS'
-            [V,~,W] = RSVD(A,l);
+            if oracle
+                [V,~,W] = rsvd_oracle(AL,AR,l);
+            else
+                [V,~,W] = RSVD(A,l);
+            end
             i = LeverageScoreSampling(V); 
             j = LeverageScoreSampling(W); 
-        otherwise % using LUPP
-            sketch = 'gauss';
-            Smpr = embed(m, l, sketch);
-            X = Smpr(A); % (l,n)
-            [~,~,j] = lu(X','vector');
-            C = A(:,j(1:l)); %(m,l)
-            [~,~,i] = lu(C,'vector');
+        otherwise 
+            warning('The CUR algorithm %s is not found!',algo);
+            i = 1:l; j = 1:l;
     end    
+end
+
+function [U,S,V] = rsvd_oracle(AL,AR,l)
+    sketch = 'gauss';
+    Smpr = embed(n, l, sketch);
+    Y = AL * Smpr(AR')'; % (m,l)
+    Q = qr(full(Y),0);
+    B = (Q' * AL) * AR;
+    [Uh,S,V] = svd(B,'econ');
+    U = Q * Uh;
 end
 
 function p = LeverageScoreSampling(V)
