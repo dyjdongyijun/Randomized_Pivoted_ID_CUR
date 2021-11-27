@@ -76,7 +76,8 @@ optimal = sfro;
 st = 5;
 ed = length(k);
 
-figure()     
+% figure()    
+subplot(1,3,1)
 semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
 hold on
 for aux = 1:length(algos)
@@ -91,11 +92,15 @@ legend('$\sqrt{\sum_{i=k+1}^r \sigma_i^2}/\sqrt{\sum_{i=1}^r \sigma_i^2}$',...
        labels{:},...
        'interpreter','latex')
 % title(sprintf('\\texttt{%s} Randomized',tag), 'interpreter','latex')
-set(gca,'FontSize',22)
+set(gca,'FontSize',20)
 
 
-figure()     
-% semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
+% spectral norm
+err = err2;
+optimal = sigma;
+% figure()   
+subplot(1,3,2)
+semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
 hold on
 for aux = 1:length(algos)
     semilogy(k, (err.(algos{aux}))./optimal(1), mkmap.(algos{aux}), 'LineWidth', 1.5)
@@ -104,42 +109,23 @@ end
 hold off
 xlim([k(st) k(ed)])
 xlabel('$k$','interpreter','latex')
-ylabel('$||A-CUR||_F/||A||_F$','interpreter','latex')
-% title(sprintf('\\texttt{%s} Randomized',tag), 'interpreter','latex')
-set(gca,'FontSize',22)
-
-% spectral norm
-% err = err2;
-% optimal = sigma;
-% figure()   
-% % subplot(1,2,1)
-% % semilogy(k, optimal(k+1)./optimal(1), 'k.-', 'MarkerSize',20, 'LineWidth', 1.5)
-% hold on
-% for aux = 1:length(algos)
-%     semilogy(k, (err.(algos{aux}))./optimal(1), mkmap.(algos{aux}), 'LineWidth', 1.5)
-% %     plot(k, (err.(algos{aux})), mkmap.(algos{aux}), 'LineWidth', 1.5)
-% end
-% hold off
-% xlim([k(st) k(ed)])
-% xlabel('$k$','interpreter','latex')
-% ylabel('$||A-CUR||_2/||A||_2$','interpreter','latex')
-% % legend('$\sigma_{k+1}/\sigma_{1}$', labels{:}, 'interpreter','latex')
+ylabel('$||A-CUR||_2/||A||_2$','interpreter','latex')
+% legend('$\sigma_{k+1}/\sigma_{1}$', labels{:}, 'interpreter','latex')
 % title('Spectral norm error', 'interpreter','latex')
-% set(gca,'FontSize',22)
+set(gca,'FontSize',20)
 
 % time
-figure()
-% subplot(1,2,2)
-semilogy(k, time.(algos{1}), mkmap.(algos{aux}), 'LineWidth', 1.5) 
+% figure()
+subplot(1,3,3)
 hold on
 for aux = 1:length(algos)
-    plot(k, time.(algos{aux}), mkmap.(algos{aux}), 'LineWidth', 1.5)
+    semilogy(k, time.(algos{aux}), mkmap.(algos{aux}), 'LineWidth', 1.5)
 end
 hold off
 xlim([k(st) k(ed)])
 xlabel('$k$','interpreter','latex')
 ylabel('Time (s)','interpreter','latex')
 % legend(labels{:}, 'interpreter','latex')
-title('Runtime', 'interpreter','latex')
-set(gca,'FontSize',22)
+% title('Runtime', 'interpreter','latex')
+set(gca,'FontSize',20)
 
