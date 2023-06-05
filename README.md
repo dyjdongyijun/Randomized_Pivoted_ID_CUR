@@ -1,6 +1,6 @@
-# Randomized (pivoting based) interpolative and CUR decompositions
+# Randomized Pivoting-based Interpolative (ID) and CUR decompositions
 
-Numerical experiments for the following work:
+Numerical experiments for our work:
 ```
 @misc{dong2021simpler,
     title={Simpler is better: A comparative study of randomized algorithms for computing the CUR decomposition},
